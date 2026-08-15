@@ -39,6 +39,7 @@ If instructions conflict materially, stop before changing state and ask for a de
 - Never run destructive Git operations such as `reset --hard`, destructive checkout, or unscoped clean commands.
 - Never delete or overwrite user data, untracked files, credentials, backups, or forensic material.
 - Never expose secrets in source, logs, fixtures, commits, prompts, or issue content.
+- Treat every repository artifact as public: exclude credentials, personal data, dumps, private endpoints, internal infrastructure details, and other sensitive content from code, prompts, logs, examples, documentation, commits, issues, and pull requests.
 - Never treat production systems, credentials, databases, or infrastructure as an experiment environment.
 - Never grant an executor permission to modify the control mechanism that constrains it during ordinary execution.
 - Never allow an executor to promote its own result to a validated checkpoint.

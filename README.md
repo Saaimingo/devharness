@@ -55,6 +55,10 @@ This repository currently contains only the approved project foundation:
 
 There is deliberately no application package, executable, dependency manifest, database schema, or harness implementation yet. Implementation must begin only under an explicitly authorized Phase 0 task and follow [AGENTS.md](AGENTS.md).
 
+## Public repository data safety
+
+This repository is intentionally **PUBLIC**. Do not publish credentials, secrets, personal data, private endpoints, database or memory dumps, internal infrastructure details, or other sensitive artifacts in code, prompts, logs, traces, fixtures, examples, documentation, commits, issues, or pull requests. Use synthetic or thoroughly sanitized material and review staged content and history before publication.
+
 ## Documentation
 
 - [Architecture](docs/architecture/overview.md)
