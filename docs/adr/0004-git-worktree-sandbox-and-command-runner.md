@@ -25,6 +25,8 @@ All subprocess execution passes through one Command Runner boundary responsible 
 
 Shell-string execution is denied by default. Force push and destructive cleanup are not normal operations.
 
+The initial effect policy permits local filesystem access only inside the sandbox and permits writes only as allowed by the Engineering Contract. Network, remote-write, production, and destructive effects are denied by default. Elevating any of these capabilities requires explicit, recorded policy and authority naming the exact capability, target, and scope before the Command Runner may execute it.
+
 ## Alternatives considered
 
 - **Direct execution in the primary checkout:** rejected because failures could corrupt the only valid state.
@@ -37,7 +39,7 @@ Worktree lifecycle and platform behavior become core responsibilities. Not all n
 
 ## Verification
 
-Security tests must prove rejection of forbidden executables, shell injection attempts, workspace escapes, disallowed environment inheritance, force push, destructive Git cleanup, timeout overrun, and oversized output. Integration tests must prove creation and disposal without changing the validated checkout.
+Security tests must prove rejection of forbidden executables, shell injection attempts, workspace escapes, disallowed environment inheritance, force push, destructive Git cleanup, unapproved network, remote-write, production, and destructive effects, timeout overrun, and oversized output. Integration tests must prove creation and disposal without changing the validated checkout.
 
 ## Revisit triggers
 

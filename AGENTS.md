@@ -39,6 +39,7 @@ If instructions conflict materially, stop before changing state and ask for a de
 - Never run destructive Git operations such as `reset --hard`, destructive checkout, or unscoped clean commands.
 - Never delete or overwrite user data, untracked files, credentials, backups, or forensic material.
 - Never expose secrets in source, logs, fixtures, commits, prompts, or issue content.
+- Treat every repository artifact as public: exclude credentials, personal data, dumps, private endpoints, internal infrastructure details, and other sensitive content from code, prompts, logs, examples, documentation, commits, issues, and pull requests.
 - Never treat production systems, credentials, databases, or infrastructure as an experiment environment.
 - Never grant an executor permission to modify the control mechanism that constrains it during ordinary execution.
 - Never allow an executor to promote its own result to a validated checkpoint.
@@ -55,10 +56,13 @@ Actions with material external effects require the exact target, a reversible pl
 - The orchestration flow is sequential and state transitions are explicit.
 - Probabilistic reasoning may occur inside bounded stages; workflow and promotion rules remain deterministic.
 - Intent Compiler and State Compiler observe and structure; they do not implement changes.
+- The initial Intent Compiler uses supplied intent, memory, and known policy; material repository findings require a versioned Intent IR reconciliation before engineering compilation.
 - Engineering Compiler produces an Engineering Contract; it does not implement the final code.
 - The Engineering Knowledge Base retrieves and classifies knowledge; it does not mutate projects.
 - Execution occurs in a disposable, least-privilege sandbox proportional to blast radius.
+- Filesystem writes are allowed only inside the contracted sandbox; network, remote-write, production, and destructive effects are denied by default and require explicit, recorded policy and authority to elevate.
 - Only independently verified states may become trusted checkpoints.
+- Verification uses a separate component and context, reads primary evidence directly, and never accepts an executor-authored final verdict or checkpoint promotion.
 - Rollback must preserve valuable work and must not mean silent destruction.
 - Memory, skills, and checkpoints are distinct concepts with provenance and validity metadata.
 

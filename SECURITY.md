@@ -8,6 +8,18 @@ DevHarness has not released an implementation. No version is currently supported
 
 When releases begin, this section will list the supported release lines and security update policy.
 
+## Public repository publication rules
+
+DevHarness is a public repository. Published code, prompts, logs, traces, fixtures, examples, documentation, commit history, issues, and pull requests must not contain:
+
+- credentials, tokens, keys, cookies, or other authentication material;
+- personal, customer, or confidential data;
+- database, memory, filesystem, or diagnostic dumps;
+- private endpoints, internal hostnames, infrastructure details, or non-public repository locations;
+- any other artifact whose disclosure could create security, privacy, legal, or operational risk.
+
+Use synthetic data or the minimum thoroughly sanitized excerpt needed to demonstrate a behavior. Redaction must remove the sensitive value rather than merely obscure its label. Before publication, inspect the staged diff and relevant generated output. If sensitive material is exposed, stop further sharing, privately notify the maintainer through the reporting path below, and rotate or revoke affected credentials; deleting the latest file alone does not remove it from Git history.
+
 ## Reporting a vulnerability
 
 Do not open a public issue for a suspected vulnerability, exposed credential, unsafe command path, sandbox escape, authorization bypass, or data-loss condition.

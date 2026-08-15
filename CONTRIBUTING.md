@@ -46,7 +46,9 @@ Keep pull requests small and reviewable. Include:
 - assumptions and unresolved questions;
 - validation performed and exact results;
 - risks and rollback plan;
-- confirmation that no secrets or unrelated changes are included.
+- confirmation that no secrets, credentials, personal data, dumps, private endpoints, internal infrastructure details, other sensitive artifacts, or unrelated changes are included.
+
+Because the repository is public, this rule applies equally to code, prompts, logs, traces, fixtures, examples, documentation, commit messages, issues, and pull-request content. Use synthetic or thoroughly sanitized examples and inspect staged changes before committing.
 
 Passing tests are necessary once code exists, but they do not by themselves prove architectural correctness, scope compliance, or safety.
 

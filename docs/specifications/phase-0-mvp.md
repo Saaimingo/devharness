@@ -47,13 +47,14 @@ The canonical demonstration:
 2. submit a natural-language change request and explicit safety policy;
 3. compile versioned Intent IR;
 4. capture State IR from exact Git and test evidence;
-5. select a small, local set of relevant engineering rules;
-6. compile an Engineering Contract;
-7. create a Git worktree sandbox;
-8. invoke a deterministic fake provider/executor to produce a known change;
-9. run independent verification, including diff scope and regression tests;
-10. record either a validated checkpoint or a rejection;
-11. resume and explain the final state from SQLite without conversation history.
+5. reconcile and version Intent IR if State IR contains a material inherited rule or fact;
+6. select a small, local set of relevant engineering rules;
+7. compile an Engineering Contract from the applicable Intent IR version;
+8. create a Git worktree sandbox;
+9. invoke a deterministic fake provider/executor to produce a known change;
+10. run independent verification, including diff scope and regression tests;
+11. record either a validated checkpoint or a rejection;
+12. resume and explain the final state from SQLite without conversation history.
 
 At least one negative scenario must attempt a forbidden command or out-of-scope change and prove that DevHarness rejects it and does not promote the state.
 
@@ -94,6 +95,9 @@ Minimum capabilities:
 - structure objective, context, requirements, constraints, acceptance criteria, exclusions, facts, assumptions, ambiguities, and contradictions;
 - distinguish user-provided fact from system inference;
 - version intent changes;
+- initially use only the human intention plus explicitly supplied persistent memory and known project policy, without inspecting the target repository on its own;
+- after State Compilation, produce a new reconciled version when primary repository evidence reveals an inherited rule or fact that materially changes interpretation, safety, architecture, or required behavior;
+- link a reconciled version to the prior Intent IR, the triggering State IR evidence, and the reconciliation rationale;
 - block on unresolved ambiguity that can materially change safety, architecture, behavior, or outcome;
 - never mutate a target repository.
 
@@ -112,6 +116,8 @@ Capture, when applicable:
 - ADR and architecture references;
 - last validated checkpoint;
 - observed risks and unknowns.
+
+The State Compiler must flag discovered rules or facts that may materially affect intent and retain their primary evidence. It does not alter Intent IR itself; the Orchestrator routes the finding back to the Intent Compiler before Engineering Compilation. Findings that are not material remain State IR inputs and do not require a new Intent IR version.
 
 The compiler must not clean, reset, stash, rewrite, or auto-correct the repository. Dirty or ambiguous state is information, not permission to destroy it.
 
@@ -152,6 +158,7 @@ Implement the sequential state machine described in the architecture overview. R
 
 - one active stage per run;
 - explicit transition preconditions;
+- a conditional, persisted Intent reconciliation transition after State Compilation and before Engineering Compilation when material findings require it;
 - persisted inputs, outputs, and errors;
 - resumability from a known stage;
 - new identity for every execution or repair attempt;
@@ -175,6 +182,16 @@ The Command Runner must:
 - distinguish read-only, local-write, network, remote-write, and destructive effects;
 - route operations requiring approval without pretending they ran.
 
+The initial effect policy must be explicit and deny-by-default:
+
+- local filesystem access is confined to the sandbox, with writes limited to those allowed by the Engineering Contract;
+- network access is denied;
+- remote-write access is denied;
+- production access and mutation are denied;
+- destructive effects are denied.
+
+Any elevation requires explicit policy and authority recorded before execution, including the exact capability, target, and scope. An approval route may request that authority, but the operation remains denied until the record exists.
+
 The executor cannot modify Control Plane policy, verification rules, or checkpoint records during an ordinary attempt.
 
 ### 5.9 Verification Engine
@@ -188,7 +205,9 @@ Evaluate:
 - forbidden operations and dependency changes;
 - evidence completeness and exact attempt identity.
 
-Return a structured verdict: `VALIDATED`, `REPAIR_REQUIRED`, or `REJECTED`. Each conclusion must link primary evidence. Executor statements are claims, not evidence.
+Verification must run through a component and context separate from the executor attempt. It must inspect primary evidence directly, including the exact diff, Git identity and status, test results, Command Records, and contract-required artifacts. It must not accept the executor's prose summary as proof.
+
+Return a structured verdict: `VALIDATED`, `REPAIR_REQUIRED`, or `REJECTED`. Each conclusion must link primary evidence. The executor cannot write the final Verification Report, choose its final verdict, or promote a checkpoint. The MVP does not require a separate operating-system process or a different model unless a later risk policy requires one.
 
 ### 5.10 State/Checkpoint Manager
 
@@ -226,12 +245,15 @@ Phase 0 is incomplete unless automated tests prove at least:
 - a resolved path cannot escape allowed roots through traversal or links;
 - force push is rejected;
 - destructive reset/clean commands are rejected;
+- network, remote-write, production, and destructive effects remain denied without an exact recorded elevation;
 - unrelated tracked and untracked files are preserved;
 - inherited secrets are excluded or redacted;
 - timeouts terminate the attempt and record the outcome;
 - output limits prevent unbounded capture;
 - provider output cannot bypass contract validation;
+- Engineering Compilation cannot proceed from a stale Intent IR when State IR requires reconciliation;
 - executor output cannot self-promote;
+- an executor-authored Verification Report or verdict is rejected;
 - a failed verification cannot create a trusted checkpoint;
 - a checkpoint cannot reference a different attempt or commit;
 - protected historical knowledge is not overwritten;

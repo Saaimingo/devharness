@@ -18,8 +18,9 @@ The constitutional rule is:
 
 ```text
 Human intent
-    -> Intent Compiler
+    -> Initial Intent Compiler
     -> State Compiler
+    -> Intent reconciliation when material state findings require it
     -> Engineering Knowledge Base
     -> Engineering Compiler
     -> Orchestrator
@@ -30,6 +31,8 @@ Human intent
 ```
 
 The MVP will be deterministic in workflow and probabilistic only inside bounded reasoning steps. Execution is sequential. An executor proposes a change; it never promotes its own output.
+
+The initial Intent Compiler uses the human intention plus project memory and policy already supplied to it; it does not inspect the repository itself. If the State Compiler later discovers an inherited rule or fact that materially changes interpretation, safety, architecture, or behavior, the Orchestrator must re-run the Intent Compiler and persist a reconciled Intent IR version before engineering compilation.
 
 ## Architecture at a glance
 
@@ -51,6 +54,10 @@ This repository currently contains only the approved project foundation:
 - the Phase 0/MVP specification and acceptance gates.
 
 There is deliberately no application package, executable, dependency manifest, database schema, or harness implementation yet. Implementation must begin only under an explicitly authorized Phase 0 task and follow [AGENTS.md](AGENTS.md).
+
+## Public repository data safety
+
+This repository is intentionally **PUBLIC**. Do not publish credentials, secrets, personal data, private endpoints, database or memory dumps, internal infrastructure details, or other sensitive artifacts in code, prompts, logs, traces, fixtures, examples, documentation, commits, issues, or pull requests. Use synthetic or thoroughly sanitized material and review staged content and history before publication.
 
 ## Documentation
 
