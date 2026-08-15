@@ -68,11 +68,15 @@ An adapter may not select architecture, reinterpret project policy, promote stat
 
 ### 4.1 Intent Compiler
 
-Transforms natural-language input into a versioned **Intent IR**. It identifies goals, requirements, constraints, acceptance criteria, exclusions, facts, assumptions, ambiguities, contradictions, and inherited project rules. It does not inspect or mutate the project beyond the inputs explicitly supplied to it.
+Transforms natural-language input into a versioned **Intent IR**. The initial compilation uses the human intention plus persistent project memory and policy already known and explicitly supplied to the compiler. It identifies goals, requirements, constraints, acceptance criteria, exclusions, facts, assumptions, ambiguities, contradictions, and known inherited project rules. It does not inspect or mutate the project on its own.
+
+After State Compilation, the Orchestrator compares discovered rules and facts with the Intent IR. If a finding materially changes the interpretation of the request, safety constraints, architecture, or required behavior, the Intent Compiler must be invoked again before Engineering Compilation. The reconciled Intent IR receives a new version, references the prior Intent IR and triggering State IR evidence, records what changed and why, and must block for authority or clarification when the conflict cannot be resolved safely. Non-material observations remain in State IR and do not cause gratuitous intent churn.
 
 ### 4.2 State Compiler
 
 Builds a **State IR** from observed technical evidence: repository identity, branch, commit, working tree, untracked files, runtime, dependencies, tests, architecture records, known risks, and last validated checkpoint. It preserves existing work and distinguishes an observed state from a proven healthy state.
+
+The State Compiler does not silently reinterpret intent. It flags inherited rules or facts that may require Intent IR reconciliation and preserves the primary evidence that triggered the flag.
 
 ### 4.3 Engineering Knowledge Base
 
@@ -118,6 +122,7 @@ Expose a common capability interface so the Control Plane does not depend on a v
 RECEIVED
   -> INTENT_COMPILED
   -> STATE_COMPILED
+       -> INTENT_RECONCILED (only for material state findings)
   -> ENGINEERING_CONTRACT_READY
   -> SANDBOX_READY
   -> EXECUTION_COMPLETE
@@ -129,7 +134,7 @@ RECEIVED
   -> KNOWLEDGE_CANDIDATES_RECORDED
 ```
 
-Every transition requires a persisted input identifier, output identifier, timestamp, actor/provider identity, and outcome. Failures do not silently advance the state machine.
+`STATE_COMPILED` may advance directly to `ENGINEERING_CONTRACT_READY` when no material finding changes intent. When reconciliation is required, `INTENT_RECONCILED` is a mandatory persisted transition and Engineering Compilation must consume the reconciled version. Every transition requires a persisted input identifier, output identifier, timestamp, actor/provider identity, and outcome. Failures do not silently advance the state machine.
 
 ## 6. Conceptual contracts
 
@@ -137,8 +142,8 @@ Phase 0 will formalize these Pydantic v2 contracts:
 
 | Contract | Produced by | Consumed by | Minimum identity |
 | --- | --- | --- | --- |
-| Intent IR | Intent Compiler | Engineering Compiler, Verification Engine | intent ID + version |
-| State IR | State Compiler | Engineering Compiler, Checkpoint Manager | repository + commit + capture ID |
+| Intent IR | Intent Compiler | Engineering Compiler, Verification Engine | intent ID + version + reconciliation inputs when applicable |
+| State IR | State Compiler | Intent Compiler when reconciliation is required, Engineering Compiler, Checkpoint Manager | repository + commit + capture ID |
 | Knowledge Selection | Knowledge Base | Engineering Compiler | query/context ID + sources |
 | Engineering Contract | Engineering Compiler | Orchestrator, Executor, Verification | contract ID + input IDs |
 | Execution Request | Orchestrator | Execution Plane | contract ID + sandbox policy |

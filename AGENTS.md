@@ -55,6 +55,7 @@ Actions with material external effects require the exact target, a reversible pl
 - The orchestration flow is sequential and state transitions are explicit.
 - Probabilistic reasoning may occur inside bounded stages; workflow and promotion rules remain deterministic.
 - Intent Compiler and State Compiler observe and structure; they do not implement changes.
+- The initial Intent Compiler uses supplied intent, memory, and known policy; material repository findings require a versioned Intent IR reconciliation before engineering compilation.
 - Engineering Compiler produces an Engineering Contract; it does not implement the final code.
 - The Engineering Knowledge Base retrieves and classifies knowledge; it does not mutate projects.
 - Execution occurs in a disposable, least-privilege sandbox proportional to blast radius.

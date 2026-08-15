@@ -47,13 +47,14 @@ The canonical demonstration:
 2. submit a natural-language change request and explicit safety policy;
 3. compile versioned Intent IR;
 4. capture State IR from exact Git and test evidence;
-5. select a small, local set of relevant engineering rules;
-6. compile an Engineering Contract;
-7. create a Git worktree sandbox;
-8. invoke a deterministic fake provider/executor to produce a known change;
-9. run independent verification, including diff scope and regression tests;
-10. record either a validated checkpoint or a rejection;
-11. resume and explain the final state from SQLite without conversation history.
+5. reconcile and version Intent IR if State IR contains a material inherited rule or fact;
+6. select a small, local set of relevant engineering rules;
+7. compile an Engineering Contract from the applicable Intent IR version;
+8. create a Git worktree sandbox;
+9. invoke a deterministic fake provider/executor to produce a known change;
+10. run independent verification, including diff scope and regression tests;
+11. record either a validated checkpoint or a rejection;
+12. resume and explain the final state from SQLite without conversation history.
 
 At least one negative scenario must attempt a forbidden command or out-of-scope change and prove that DevHarness rejects it and does not promote the state.
 
@@ -94,6 +95,9 @@ Minimum capabilities:
 - structure objective, context, requirements, constraints, acceptance criteria, exclusions, facts, assumptions, ambiguities, and contradictions;
 - distinguish user-provided fact from system inference;
 - version intent changes;
+- initially use only the human intention plus explicitly supplied persistent memory and known project policy, without inspecting the target repository on its own;
+- after State Compilation, produce a new reconciled version when primary repository evidence reveals an inherited rule or fact that materially changes interpretation, safety, architecture, or required behavior;
+- link a reconciled version to the prior Intent IR, the triggering State IR evidence, and the reconciliation rationale;
 - block on unresolved ambiguity that can materially change safety, architecture, behavior, or outcome;
 - never mutate a target repository.
 
@@ -112,6 +116,8 @@ Capture, when applicable:
 - ADR and architecture references;
 - last validated checkpoint;
 - observed risks and unknowns.
+
+The State Compiler must flag discovered rules or facts that may materially affect intent and retain their primary evidence. It does not alter Intent IR itself; the Orchestrator routes the finding back to the Intent Compiler before Engineering Compilation. Findings that are not material remain State IR inputs and do not require a new Intent IR version.
 
 The compiler must not clean, reset, stash, rewrite, or auto-correct the repository. Dirty or ambiguous state is information, not permission to destroy it.
 
@@ -152,6 +158,7 @@ Implement the sequential state machine described in the architecture overview. R
 
 - one active stage per run;
 - explicit transition preconditions;
+- a conditional, persisted Intent reconciliation transition after State Compilation and before Engineering Compilation when material findings require it;
 - persisted inputs, outputs, and errors;
 - resumability from a known stage;
 - new identity for every execution or repair attempt;
@@ -231,6 +238,7 @@ Phase 0 is incomplete unless automated tests prove at least:
 - timeouts terminate the attempt and record the outcome;
 - output limits prevent unbounded capture;
 - provider output cannot bypass contract validation;
+- Engineering Compilation cannot proceed from a stale Intent IR when State IR requires reconciliation;
 - executor output cannot self-promote;
 - a failed verification cannot create a trusted checkpoint;
 - a checkpoint cannot reference a different attempt or commit;

@@ -18,8 +18,9 @@ The constitutional rule is:
 
 ```text
 Human intent
-    -> Intent Compiler
+    -> Initial Intent Compiler
     -> State Compiler
+    -> Intent reconciliation when material state findings require it
     -> Engineering Knowledge Base
     -> Engineering Compiler
     -> Orchestrator
@@ -30,6 +31,8 @@ Human intent
 ```
 
 The MVP will be deterministic in workflow and probabilistic only inside bounded reasoning steps. Execution is sequential. An executor proposes a change; it never promotes its own output.
+
+The initial Intent Compiler uses the human intention plus project memory and policy already supplied to it; it does not inspect the repository itself. If the State Compiler later discovers an inherited rule or fact that materially changes interpretation, safety, architecture, or behavior, the Orchestrator must re-run the Intent Compiler and persist a reconciled Intent IR version before engineering compilation.
 
 ## Architecture at a glance
 
