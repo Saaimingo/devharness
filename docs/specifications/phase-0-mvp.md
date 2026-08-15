@@ -182,6 +182,16 @@ The Command Runner must:
 - distinguish read-only, local-write, network, remote-write, and destructive effects;
 - route operations requiring approval without pretending they ran.
 
+The initial effect policy must be explicit and deny-by-default:
+
+- local filesystem access is confined to the sandbox, with writes limited to those allowed by the Engineering Contract;
+- network access is denied;
+- remote-write access is denied;
+- production access and mutation are denied;
+- destructive effects are denied.
+
+Any elevation requires explicit policy and authority recorded before execution, including the exact capability, target, and scope. An approval route may request that authority, but the operation remains denied until the record exists.
+
 The executor cannot modify Control Plane policy, verification rules, or checkpoint records during an ordinary attempt.
 
 ### 5.9 Verification Engine
@@ -195,7 +205,9 @@ Evaluate:
 - forbidden operations and dependency changes;
 - evidence completeness and exact attempt identity.
 
-Return a structured verdict: `VALIDATED`, `REPAIR_REQUIRED`, or `REJECTED`. Each conclusion must link primary evidence. Executor statements are claims, not evidence.
+Verification must run through a component and context separate from the executor attempt. It must inspect primary evidence directly, including the exact diff, Git identity and status, test results, Command Records, and contract-required artifacts. It must not accept the executor's prose summary as proof.
+
+Return a structured verdict: `VALIDATED`, `REPAIR_REQUIRED`, or `REJECTED`. Each conclusion must link primary evidence. The executor cannot write the final Verification Report, choose its final verdict, or promote a checkpoint. The MVP does not require a separate operating-system process or a different model unless a later risk policy requires one.
 
 ### 5.10 State/Checkpoint Manager
 
@@ -233,6 +245,7 @@ Phase 0 is incomplete unless automated tests prove at least:
 - a resolved path cannot escape allowed roots through traversal or links;
 - force push is rejected;
 - destructive reset/clean commands are rejected;
+- network, remote-write, production, and destructive effects remain denied without an exact recorded elevation;
 - unrelated tracked and untracked files are preserved;
 - inherited secrets are excluded or redacted;
 - timeouts terminate the attempt and record the outcome;
@@ -240,6 +253,7 @@ Phase 0 is incomplete unless automated tests prove at least:
 - provider output cannot bypass contract validation;
 - Engineering Compilation cannot proceed from a stale Intent IR when State IR requires reconciliation;
 - executor output cannot self-promote;
+- an executor-authored Verification Report or verdict is rejected;
 - a failed verification cannot create a trusted checkpoint;
 - a checkpoint cannot reference a different attempt or commit;
 - protected historical knowledge is not overwritten;

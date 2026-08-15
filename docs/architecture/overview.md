@@ -94,9 +94,21 @@ Runs the state machine and enforces transition preconditions. It does not replac
 
 Creates isolation proportional to risk. Git worktrees are the default source-code sandbox. The Command Runner is the only subprocess boundary and owns argument handling, working-directory validation, environment filtering, timeouts, output limits, cancellation, audit records, and command policy decisions.
 
+The MVP effect policy is deny-by-default:
+
+- local filesystem access is limited to the sandbox and only the writes allowed by the Engineering Contract;
+- network access is denied by default;
+- remote-write effects are denied by default;
+- production access and mutation are denied by default;
+- destructive effects are denied by default.
+
+Any elevation requires explicit policy and authority recorded with the exact capability, target, scope, and decision before execution. A Git worktree is source isolation, not an operating-system sandbox and not containment for network or other external effects.
+
 ### 4.7 Verification Engine
 
-Evaluates the implementation attempt against functional acceptance criteria, regression checks, architectural invariants, security requirements, planned scope, and the Engineering Contract. It produces a **Verification Report** with evidence. It is independent of the executor and cannot accept unverified claims as proof.
+Evaluates the implementation attempt against functional acceptance criteria, regression checks, architectural invariants, security requirements, planned scope, and the Engineering Contract. It produces a **Verification Report** with evidence.
+
+For the MVP, independence is operational rather than necessarily process- or model-level separation. Verification runs in a separate component and fresh verification context, reads primary evidence directly from the exact attempt, and bases conclusions on the diff, Git identity and status, test results, command records, and other contract-required artifacts. An executor summary is a claim, never evidence. The executor cannot write the final Verification Report, select its final verdict, or promote a checkpoint. A separate process or model is optional unless later evidence or risk policy requires it.
 
 ### 4.8 State/Checkpoint Manager
 

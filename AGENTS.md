@@ -59,7 +59,9 @@ Actions with material external effects require the exact target, a reversible pl
 - Engineering Compiler produces an Engineering Contract; it does not implement the final code.
 - The Engineering Knowledge Base retrieves and classifies knowledge; it does not mutate projects.
 - Execution occurs in a disposable, least-privilege sandbox proportional to blast radius.
+- Filesystem writes are allowed only inside the contracted sandbox; network, remote-write, production, and destructive effects are denied by default and require explicit, recorded policy and authority to elevate.
 - Only independently verified states may become trusted checkpoints.
+- Verification uses a separate component and context, reads primary evidence directly, and never accepts an executor-authored final verdict or checkpoint promotion.
 - Rollback must preserve valuable work and must not mean silent destruction.
 - Memory, skills, and checkpoints are distinct concepts with provenance and validity metadata.
 
